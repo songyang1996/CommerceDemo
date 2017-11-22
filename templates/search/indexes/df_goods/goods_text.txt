@@ -1,0 +1,3 @@
+{{ object.name }} # 根据商品的名称建立索引 文件名为模型类名_text.txt全小写
+{{ object.desc }} # 根据商品的简介建立索引
+{{ object.detail }} # 根据商品的详情建立索引

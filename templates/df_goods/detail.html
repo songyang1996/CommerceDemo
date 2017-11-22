@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>天天生鲜-商品详情</title>
+	{% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+	<script type="text/javascript" src="{% static 'js/jquery-1.12.4.min.js' %}"></script>
+	<script>
+$(function () {
+		update_total_price()
+		// 计算商品的总价
+		function  update_total_price() {
+				// 获取商品的数量和价格
+				goods_price = $('.show_pirze').children('em').text()
+				goods_count = $('.num_show').val()
+				// 计算商品的总价
+				goods_price = parseFloat(goods_price)
+				goods_count = parseInt(goods_count)
+				total_price = goods_price*goods_count
+				// 重新设置商品总价
+				$('.total').children('em').text(total_price.toFixed(2)+'元')
+		}
+
+		// 商品增加
+		$('.add').click(function () {
+				// 获取商品的数量
+				goods_count = $('.num_show').val()
+				// 加1
+				goods_count = parseInt(goods_count)+1
+				// 重新设置商品数目
+				$('.num_show').val(goods_count)
+				// 更新总价
+				update_total_price()
+		})
+
+		// 商品减少
+		$('.minus').click(function () {
+				// 获取商品的数量
+				goods_count = $('.num_show').val()
+
+				// 加1
+				goods_count = parseInt(goods_count)-1
+				if (goods_count == 0){
+						goods_count = 1
+				}
+
+				// 重新设置商品数目
+				$('.num_show').val(goods_count)
+
+				// 更新总价
+				update_total_price()
+		})
+
+		// 手动输入
+		$('.num_show').blur(function () {
+				// 获取商品的数量
+				goods_count = $('.num_show').val()
+				// 校验数据
+				if (isNaN(goods_count) || goods_count.trim().length == 0 || parseInt(goods_count) <= 0) {
+						goods_count = 1
+				}
+				// 重新设置商品数目
+				$('.num_show').val(parseInt(goods_count))
+
+				// 更新总价
+				update_total_price()
+		})
+})
+</script>
+
+</head>
+<body>
+	<div class="header_con">
+		<div class="header">
+			<div class="welcome fl">欢迎来到天天生鲜!</div>
+			<div class="fr">
+				{% if request.session.islogin %}
+					<div class="login_btn fl">
+						欢迎您：<em>{{ request.session.username }}</em>
+						<span>|</span>
+						<a href="{% url 'user:logout' %}">退出</a>
+					</div>
+				{% else %}
+					<div class="login_btn fl">
+						<a href="{% url 'user:login' %}">登录</a>
+						<span>|</span>
+						<a href="{% url 'user:register' %}">注册</a>
+					</div>
+				{% endif %}
+				<div class="user_link fl">
+					<span>|</span>
+					<a href="{% url 'user:user' %}">用户中心</a>
+					<span>|</span>
+					<a href="{% url 'cart:show' %}">我的购物车</a>
+					<span>|</span>
+					<a href="{% url 'user:order' %}">我的订单</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="search_bar clearfix">
+		<a href="{% url 'goods:index' %}" class="logo fl"><img src='{% static "images/logo.png" %}'></a>
+		<div class="search_con fl">
+			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+			<input type="button" class="input_btn fr" name="" value="搜索">
+		</div>
+		<div class="guest_cart fr">
+			<a href="{% url 'cart:show' %}" class="cart_name fl">我的购物车</a>
+			<div class="goods_count fl" id="show_count">1</div>
+		</div>
+	</div>
+
+	<div class="navbar_con">
+		<div class="navbar clearfix">
+			<div class="subnav_con fl">
+				<h1>全部商品分类</h1>
+				<span></span>
+				<ul class="subnav">
+					<li><a href="/list/1/1/" class="fruit">新鲜水果</a></li>
+					<li><a href="/list/2/1/" class="seafood">海鲜水产</a></li>
+					<li><a href="/list/3/1/" class="meet">猪牛羊肉</a></li>
+					<li><a href="/list/4/1/" class="egg">禽类蛋品</a></li>
+					<li><a href="/list/5/1/" class="vegetables">新鲜蔬菜</a></li>
+					<li><a href="/list/6/1/" class="ice">速冻食品</a></li>
+				</ul>
+			</div>
+			<ul class="navlist fl">
+				<li><a href="">首页</a></li>
+				<li class="interval">|</li>
+				<li><a href="">手机生鲜</a></li>
+				<li class="interval">|</li>
+				<li><a href="">抽奖</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="breadcrumb">
+		<div class="breadcrumb">
+			<a href="{% url 'goods:index' %}">全部分类</a>
+			<span>></span>
+			<a href="{% url 'goods:list' type_id=type_id page=1 %}">{{ type_title }}</a>
+		</div>
+	</div>
+
+	<div class="goods_detail_con clearfix">
+		<div class="goods_detail_pic fl"><img src="{% static good.image %}"></div>
+
+		<div class="goods_detail_list fr">
+			<h3>{{ good.name }}</h3>
+			<p>{{ good.desc }}</p>
+			<div class="prize_bar">
+				<span class="show_pirze">¥<em>{{ good.price }}</em></span>
+				<span class="show_unit">单  位：{{ good.unite }}</span>
+			</div>
+			<div class="goods_num clearfix">
+				<div class="num_name fl">数 量：</div>
+				<div class="num_add fl">
+					<input type="text" class="num_show fl" value="1">
+					<a href="javascript:;" class="add fr">+</a>
+					<a href="javascript:;" class="minus fr">-</a>
+				</div>
+			</div>
+			<div class="total">总价：<em>16.80元</em></div>
+			<div class="operate_btn">
+				{% csrf_token %}
+				<a href="javascript:;" class="buy_btn">立即购买</a>
+				<a href="javascript:;" goods_id="{{ good.id }}" class="add_cart" id="add_cart">加入购物车</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+					{% for goods in goods_new %}
+					<li>
+						<a href="/goods/detail/{{ goods.id }}"><img src="{% static goods.image %}"></a>
+						<h4><a href="#">{{ goods.name }}</a></h4>
+						<div class="prize">￥{{ goods.price }}</div>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<ul class="detail_tab clearfix">
+				<li class="active">商品介绍</li>
+				<li>评论</li>
+			</ul>
+
+			<div class="tab_content">
+				<dl>
+					<dt>商品详情：</dt>
+					<dd>{{ good.detail|safe }}</dd>
+				</dl>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="footer">
+		<div class="foot_link">
+			<a href="#">关于我们</a>
+			<span>|</span>
+			<a href="#">联系我们</a>
+			<span>|</span>
+			<a href="#">招聘人才</a>
+			<span>|</span>
+			<a href="#">友情链接</a>
+		</div>
+		<p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
+		<p>电话：010-****888    京ICP备*******8号</p>
+	</div>
+	<div class="add_jump"></div>
+
+	<script type="text/javascript" src="{% static 'js/jquery-1.12.4.min.js' %}"></script>
+	<script type="text/javascript">
+		$.get('{% url "cart:count" %}', function(data){
+							// {'res':商品总数}
+							$('#show_count').html(data.res)
+					 })
+
+		var $add_x = $('#add_cart').offset().top;
+		var $add_y = $('#add_cart').offset().left;
+
+		var $to_x = $('#show_count').offset().top;
+		var $to_y = $('#show_count').offset().left;
+
+		$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
+		$('#add_cart').click(function(){
+			// 发起ajax请求提交订单
+			goods_count = $('.num_show').val();
+			goods_id = $(this).attr('goods_id');
+			console.log(goods_count, goods_id);
+			csrf = $('input[name="csrfmiddlewaretoken"]').val()
+			params = {
+				'goods_count':goods_count,
+				'goods_id':goods_id,
+				'csrfmiddlewaretoken':csrf
+			}
+			$.post("{% url 'cart:add' %}", params, function(data) {
+				/*optional stuff to do after success */
+				if(data.res == 5){
+					$(".add_jump").stop().animate({
+						'left':
+						$to_y+7,
+						'top': $to_x+7},
+						"fast", function() {
+							$(".add_jump").fadeOut('fast',function(){
+								count = $('#show_count').html()
+                count = parseInt(count)+parseInt(goods_count)
+                $('#show_count').html(count);
+							});
+
+					});
+				}
+				else{
+					alert(data.errmsg)
+				}
+			});
+
+		})
+	</script>
+
+</body>
+</html>
