@@ -290,7 +290,7 @@
 			<li class="col05">小计</li>
 			<li class="col06">操作</li>
 		</ul>
-		<form method="post" action="">
+		<form method="post" action="{%url 'order:place'%}">
 	{% for goods in goods_li %}
 <ul class="cart_list_td clearfix">
 	<li class="col01"><input type="checkbox" name="goods_ids" value="{{ goods.id }}" checked></li>
@@ -317,7 +317,7 @@
 		<li class="col01"><input type="checkbox" name="" checked=""></li>
 		<li class="col02">全选</li>
 		<li class="col03">合计(不含运费)：<span>¥</span><em>{{ total_price }}</em><br>共计<b>{{ total_count }}</b>件商品</li>
-		<li class="col04"><a href="#">去结算</a></li>
+		<li class="col04"><input type="submit" value="去结算"></li>
 	</ul>
 		</form>
 	<div class="footer">
