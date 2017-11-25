@@ -1,5 +1,7 @@
 from django.db import models
 from db.base_model import BaseModel
+from df_user.models import PassportInfo
+# from df_goods.models import Goods
 # Create your models here.
 class OrderInfoManager(models.Manager):
     "订单信息模型管理器类"
@@ -30,9 +32,9 @@ class OrderInfo(BaseModel):
         (5, "已完成"),
     )
 
-    order_id = models.CharField(max_length=64, primary_key=true, verbose_name="订单编号")
+    order_id = models.CharField(max_length=64, primary_key=True, verbose_name="订单编号")
     passport = models.ForeignKey("df_user.Passport", verbose_name="下单账户")
-    addr = models.ForeignKey("df_user.Address", verbose_name="收货地址")
+    addr = models.ForeignKey("df_user.PassportInfo", verbose_name="收货地址")
     total_count = models.IntegerField(default=1, verbose_name="商品总数")
     total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="商品总价")
     transit_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="运费")
@@ -44,13 +46,14 @@ class OrderInfo(BaseModel):
     class Meta:
         db_table = "s_order_info"
 
-
+class OrderGoodsManager(models.Manager):
+    pass
 class OrderGoods(BaseModel):
     order = models.ForeignKey("OrderInfo", verbose_name="所属订单")
-    goods = models.ForeignKey("df_goods", verbose_name="订单商品")
+    goods = models.ForeignKey("df_goods.Goods", verbose_name="订单商品")
     count = models.IntegerField(default=1, verbose_name="商品数量")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="商品价格")
-    objects = OrderGoodes()
+    objects = OrderGoodsManager()
 
     class Meta:
         db_table = "s_order_goods"
