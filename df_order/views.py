@@ -10,9 +10,9 @@ from django_redis import get_redis_connection
 @login_required
 def order_place(request):
     "显示地址订单页"
-    goods_ids = request.POST.getlist("goods_id")
+    goods_ids = request.POST.getlist("goods_ids")
     print(goods_ids)
-    if not all goods_ids:
+    if not all(goods_ids):
         # 数据不完整则跳转回购物车页面
         return redirect(reverse("cart:show"))
     # 获取登录用户的id
@@ -26,9 +26,9 @@ def order_place(request):
     goods_li =list()
 
     conn = get_redis_connection('default')
-    cart_key = "cart_%d" %user_id
+    cart_key = "cart_%d" % user_id
     # 用户所要购买的商品信息，数目，和小计
-    for temp in goodes_ids:
+    for temp in goods_ids:
         # 根据商品id获取商品信息
         goods = Goods.objects.get_goods_by_id(goods_id=temp)
         # redis服务器中获取id对应的商品的数目
@@ -39,7 +39,7 @@ def order_place(request):
         goods.amount = amount
         goods_li.append(goods)
         total_count += int(count)
-        total_price == amount
+        total_price += amount
 
     # 运费 需要修改 这里全部设为10元
     transit_price = 10

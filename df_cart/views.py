@@ -10,7 +10,7 @@ def cart_add(request):
     '''post 提交到购物车'''
     # 登录判断 ajax请求不能用装饰器 因为无法跳转
     # 传入商品id 购买个数
-    goods_id = request.POST.get('goods_id')
+    goods_id = request.POST.get('goods_ids')
     count = request.POST.get('goods_count')
     if not request.session.has_key('islogin'):
         # 用户未登录
@@ -95,7 +95,7 @@ def cart_show(request):
         # 动态给goods增加属性count, 记录商品的数目
         goods.count = count
         goods_li.append(goods)
-    
+
         total_count += int(count)
         total_price += goods.amount
 

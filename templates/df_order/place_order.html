@@ -53,7 +53,7 @@
 	<div class="common_list_con clearfix">
 		<dl>
 			<dt>寄送到：</dt>
-			<dd><input type="radio" name="" checked="">{{passport_info.address}} （{{passport_info.name}} 收） {{passport_info.phone}}</dd>
+			<dd><input type="radio" name="" checked="">{{passport_info.addr}} （{{passport_info.name}} 收） {{passport_info.phone}}</dd>
 		</dl>
 		<a href= "{% url 'user:address' %}"class="edit_site">编辑收货地址</a>
 
@@ -67,7 +67,7 @@
 			<input type="radio" name="pay_style" value="2">
 			<label class="weixin">微信支付</label>
 			<input type="radio" name="pay_style" value="3">
-			<label class="zhifubao">支付宝</label>
+			<label class="zhifubao"></label>
 			<input type="radio" name="pay_style" value="4">
 			<label class="bank">银行卡支付</label>
 		</div>
@@ -133,7 +133,7 @@
 
 		<div class="mask"></div>
 	</div>
-	<script type="text/javascript" src="js/jquery-1.12.2.js"></script>
+	<script type="text/javascript" src='{% static "js/jquery-1.12.4.min.js" %}'></script>
 	<script type="text/javascript">
 		$('#order_btn').click(function() {
 			localStorage.setItem('order_finish',2);
