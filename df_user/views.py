@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from df_user.models import Passport, PassportInfo
+from df_goods.models import Goods
+from df_order.models import OrderGoods, OrderInfo
 from django.http import JsonResponse, HttpResponse
 import re
 from django.core.urlresolvers import reverse
@@ -10,7 +12,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer
 # 导入限制请求方法的装饰器
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django_redis import get_redis_connection
-from df_goods.models import Goods
+
 # Create your views here.
 # /user/register/
 def register(request):
@@ -128,10 +130,29 @@ def center_info(request):
     }
     return render(request, "df_user/user_center_info.html", context)
 
+# /user/center/order
 @login_required
 def center_order(request):
     '''订单详情页视图'''
-    return render(request, "df_user/user_center_order.html", {'page':'order'})
+    # 获取登录用户id
+    user_id = request.session.get('user_id')
+    order_li = OrderInfo.objects.get_order_by_id(user_id)
+    for order in order_li:
+        order_id = order.order_id
+        # order_goods_li = OrderGoods.objects.get_order_goods_by_order_id(order_id=order_id)
+        order_goods_li = OrderGoods.objects.filter(order_id=order_id)
+        # 遍历prder_goods_li计算商品小计
+        for order_goods in order_goods_li:
+            count = order_goods.count
+            price = order_goods.price
+            amount = count*price
+            order_goods.amount = amount
+        order.order_goods_li = order_goods_li
+    context = {
+        "order_li": order_li,
+        "page": "order"
+    }
+    return render(request, "df_user/user_center_order.html", context)
 
 @login_required
 def center_site(request):

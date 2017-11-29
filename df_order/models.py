@@ -5,7 +5,22 @@ from df_user.models import PassportInfo
 # Create your models here.
 class OrderInfoManager(models.Manager):
     "订单信息模型管理器类"
-    pass
+    def get_order_by_id(self, user_id):
+        try:
+            orders_li = self.filter(passport_id=user_id)
+            return orders_li
+        except Exception as e:
+            print(e)
+
+    # def save_order_info(self, passport_id, pay_method, goods_ids):
+    #     goods_ids = goods_ids.split(",")
+    #     order = self.create(
+    #         passport_id = passport_id,
+    #         pay_method = pay_method,
+    #
+    #     )
+
+
 
 class OrderInfo(BaseModel):
     "订单信息模型类"
@@ -47,8 +62,15 @@ class OrderInfo(BaseModel):
         db_table = "s_order_info"
 
 class OrderGoodsManager(models.Manager):
-    pass
+    def save_order_goods(self):
+        pass
+
+    def get_order_goods_by_order_id(self, order_id):
+        order_li = self.filter(order_id=order_id)
+        return order_li
+
 class OrderGoods(BaseModel):
+    "订单商品模型类"
     order = models.ForeignKey("OrderInfo", verbose_name="所属订单")
     goods = models.ForeignKey("df_goods.Goods", verbose_name="订单商品")
     count = models.IntegerField(default=1, verbose_name="商品数量")

@@ -1,30 +1,32 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
 <head>
-		{% load staticfiles %}
+	{% load staticfiles %}
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>天天生鲜-提交订单</title>
 	<link rel="stylesheet" type="text/css" href='{% static "css/reset.css" %}'>
 	<link rel="stylesheet" type="text/css" href='{% static "css/main.css" %}'>
 	<!-- <script type="text/javascript" src='{% static "js/jquery-1.12.4.min.js" %}'></script> -->
 </head>
+
 <body>
 	<div class="header_con">
 		<div class="header">
 			<div class="welcome fl">欢迎来到天天生鲜!</div>
 			<div class="fr">
 				{% if request.session.islogin %}
-					<div class="login_btn fl">
-						欢迎您：<em>{{ request.session.username }}</em>
-						<span>|</span>
-						<a href="{% url 'user:logout' %}">退出</a>
-					</div>
+				<div class="login_btn fl">
+					欢迎您：<em>{{ request.session.username }}</em>
+					<span>|</span>
+					<a href="{% url 'user:logout' %}">退出</a>
+				</div>
 				{% else %}
-					<div class="login_btn fl">
-						<a href="{% url 'user:login' %}">登录</a>
-						<span>|</span>
-						<a href="{% url 'user:register' %}">注册</a>
-					</div>
+				<div class="login_btn fl">
+					<a href="{% url 'user:login' %}">登录</a>
+					<span>|</span>
+					<a href="{% url 'user:register' %}">注册</a>
+				</div>
 				{% endif %}
 				<div class="user_link fl">
 					<span>|</span>
@@ -53,9 +55,9 @@
 	<div class="common_list_con clearfix">
 		<dl>
 			<dt>寄送到：</dt>
-			<dd><input type="radio" name="" checked="">{{passport_info.addr}} （{{passport_info.name}} 收） {{passport_info.phone}}</dd>
+			<dd><input type="radio" name="passport_info_id" value="{{ passport_info.id }}" checked="">{{passport_info.addr}} （{{passport_info.name}} 收） {{passport_info.phone}}</dd>
 		</dl>
-		<a href= "{% url 'user:address' %}"class="edit_site">编辑收货地址</a>
+		<a href="{% url 'user:address' %}" class="edit_site">编辑收货地址</a>
 
 	</div>
 
@@ -84,16 +86,16 @@
 			<li class="col05">小计</li>
 		</ul>
 		{% for goods in goods_li %}
-	<ul class="goods_list_td clearfix">
-		<li class="col01">{{ forloop.counter }}</li>
-		<li class="col02"><img src="{% static goods.image %}"></li>
-		<li class="col03">{{ goods.name }}</li>
-		<li class="col04">{{ goods.unite }}</li>
-		<li class="col05">{{ goods.price }}元</li>
-		<li class="col06">{{ goods.count }}</li>
-		<li class="col07">{{ goods.amount }}元</li>
-	</ul>
-			{% endfor %}
+		<ul class="goods_list_td clearfix">
+			<li class="col01">{{ forloop.counter }}</li>
+			<li class="col02"><img src="{% static goods.image %}"></li>
+			<li class="col03">{{ goods.name }}</li>
+			<li class="col04">{{ goods.unite }}</li>
+			<li class="col05">{{ goods.price }}元</li>
+			<li class="col06">{{ goods.count }}</li>
+			<li class="col07">{{ goods.amount }}元</li>
+		</ul>
+		{% endfor %}
 	</div>
 
 	<h3 class="common_title">总金额结算</h3>
@@ -107,8 +109,7 @@
 	</div>
 
 	<div class="order_submit clearfix">
-		{% csrf_token %}
-    {# 给提交订单a标签增加一个属性goods_ids, 记录用户要购买的商品的id #}
+		{% csrf_token %} {# 给提交订单a标签增加一个属性goods_ids, 记录用户要购买的商品的id #}
 		<a href="javascript:;" goods_ids="{{ goods_ids }}" id="order_btn">提交订单</a>
 	</div>
 
@@ -123,7 +124,7 @@
 			<a href="#">友情链接</a>
 		</div>
 		<p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
-		<p>电话：010-****888    京ICP备*******8号</p>
+		<p>电话：010-****888 京ICP备*******8号</p>
 	</div>
 
 	<div class="popup_con">
@@ -136,18 +137,40 @@
 	<script type="text/javascript" src='{% static "js/jquery-1.12.4.min.js" %}'></script>
 	<script type="text/javascript">
 		$('#order_btn').click(function() {
-			localStorage.setItem('order_finish',2);
+			// 获取收获地址， 支付方式， 用户购物的商品id
+			addr_id = $("input[name='passport_info_id']").val()
+			pay_method = $('input[name="pay_style"]:checked').val()
+			goods_ids = $(this).attr('goods_ids');
+			csrf = $('input[name="csrfmiddlewaretoken"]').val()
 
-			$('.popup_con').fadeIn('fast', function() {
+			params = {
+				"addr_id": addr_id,
+				"pay_method": pay_method,
+				"goods_ids": goods_ids,
+				"csrfmiddlewaretoken": csrf
+			}
+			$.post('/order/handle/', params, function(data) {
+				if (data.res == 6) {
+					// 订单创建成功
+					localStorage.setItem('order_finish', 2);
+					$('.popup_con').fadeIn('fast', function() {
 
-				setTimeout(function(){
-					$('.popup_con').fadeOut('fast',function(){
-						window.location.href = 'index.html';
+						setTimeout(function() {
+							$('.popup_con').fadeOut('fast', function() {
+								window.location.href = data.next_url;
+							});
+						}, 3000)
+
 					});
-				},3000)
-
+				}
+				else{
+					alert(data.errmsg)
+				}
+				/*optional stuff to do after success */
 			});
+
 		});
 	</script>
 </body>
+
 </html>

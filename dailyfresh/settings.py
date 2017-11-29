@@ -128,8 +128,8 @@ EMAIL_FROM = 'dailyfresh<levansongyang@163.com>'
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        # 连接虚拟机的redis数据库
-        "LOCATION": "redis://192.168.64.83:6379/6",
+        # 连接redis数据库
+        "LOCATION": "redis://192.168.64.41:6379/6",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "PASSWORD": ""
